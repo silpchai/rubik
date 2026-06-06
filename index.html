@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rubik's Tracker (ทำทีละบรรทัด)</title>
+    <title>Rubik's Tracker (พอดี 10 ตัว)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,8 +27,8 @@
         }
 
         .header {
-            margin-top: 15px;
-            margin-bottom: 15px;
+            margin-top: 10px;
+            margin-bottom: 10px;
             color: white;
             text-align: center;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
@@ -36,7 +36,7 @@
 
         .header h1 {
             margin: 0;
-            font-size: 26px;
+            font-size: 24px;
             letter-spacing: 1px;
         }
 
@@ -44,24 +44,25 @@
         .keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            width: 90%;
-            max-width: 400px;
+            gap: 8px; /* ลดช่องไฟปุ่มเพื่อให้มีที่ว่างในจอมากขึ้น */
+            width: 95%; /* ขยายความกว้างแผงปุ่ม */
+            max-width: 450px;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            padding: 15px;
+            padding: 12px;
             border-radius: 15px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
         }
 
         button.cube-btn {
             position: relative;
-            padding: 12px 0;
-            font-size: 20px;
+            padding: 10px 0;
+            font-size: 18px;
             font-weight: 900;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             outline: none;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
@@ -70,20 +71,20 @@
         }
 
         button.cube-btn:active {
-            transform: translateY(5px);
+            transform: translateY(4px);
         }
 
-        .btn-u { background-color: #ffffff; color: #333 !important; text-shadow: none !important; box-shadow: 0 5px 0 #cccccc; }
+        .btn-u { background-color: #ffffff; color: #333 !important; text-shadow: none !important; box-shadow: 0 4px 0 #cccccc; }
         .btn-u:active { box-shadow: 0 0px 0 #cccccc; }
-        .btn-d { background-color: #ffd500; color: #333 !important; text-shadow: none !important; box-shadow: 0 5px 0 #ccaa00; }
+        .btn-d { background-color: #ffd500; color: #333 !important; text-shadow: none !important; box-shadow: 0 4px 0 #ccaa00; }
         .btn-d:active { box-shadow: 0 0px 0 #ccaa00; }
-        .btn-l { background-color: #ff5800; color: white; box-shadow: 0 5px 0 #cc4600; }
+        .btn-l { background-color: #ff5800; color: white; box-shadow: 0 4px 0 #cc4600; }
         .btn-l:active { box-shadow: 0 0px 0 #cc4600; }
-        .btn-r { background-color: #b71234; color: white; box-shadow: 0 5px 0 #8c0e27; }
+        .btn-r { background-color: #b71234; color: white; box-shadow: 0 4px 0 #8c0e27; }
         .btn-r:active { box-shadow: 0 0px 0 #8c0e27; }
-        .btn-f { background-color: #009b48; color: white; box-shadow: 0 5px 0 #007a38; }
+        .btn-f { background-color: #009b48; color: white; box-shadow: 0 4px 0 #007a38; }
         .btn-f:active { box-shadow: 0 0px 0 #007a38; }
-        .btn-b { background-color: #0046ad; color: white; box-shadow: 0 5px 0 #003685; }
+        .btn-b { background-color: #0046ad; color: white; box-shadow: 0 4px 0 #003685; }
         .btn-b:active { box-shadow: 0 0px 0 #003685; }
 
         .prime {
@@ -93,17 +94,17 @@
 
         /* --- แผงแสดงผล --- */
         .display-board {
-            width: 90%;
-            max-width: 400px;
+            width: 96%; /* ขยายพื้นที่กล่องให้ชิดขอบจอมากขึ้น */
+            max-width: 450px;
             background: #fff;
             border-radius: 15px;
-            padding: 10px 15px;
+            padding: 10px 8px; /* ลดขอบในซ้ายขวา */
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-sizing: border-box;
         }
 
@@ -117,70 +118,62 @@
         }
 
         .step-row.active-container {
-            transform: scale(1.02);
+            transform: scale(1.01); /* ลดแอนิเมชันขยายร่างลงนิดนึงเพื่อไม่ให้ข้อความล้นจอ */
         }
 
         .step-label {
-            width: 55px;
+            width: 45px; /* บีบป้ายชื่อให้แคบลง */
             font-weight: 800;
-            font-size: 14px;
+            font-size: 12px;
             color: #555;
             text-align: right;
-            padding-right: 10px;
+            padding-right: 6px;
         }
 
         .step-input {
             flex-grow: 1;
-            padding: 8px 10px;
-            font-size: 18px;
-            font-weight: bold;
+            padding: 8px 5px; /* ลดขอบในให้มีที่วางอักษรเยอะขึ้น */
+            font-size: 13.5px; /* ขนาดกำลังดีสำหรับ 10 ตัวบนมือถือ */
+            letter-spacing: -0.3px; /* บีบช่องไฟระหว่างตัวอักษรลง */
             font-family: 'Courier New', Courier, monospace;
             border: 2px solid #ddd;
-            border-radius: 8px;
+            border-radius: 6px;
             background-color: #fafafa;
             pointer-events: none;
-            color: #222;
+            color: #111;
             transition: all 0.3s;
-            width: 0; /* กันกล่องทะลุเวลาเพิ่มปุ่มใหม่ */
+            width: 0; 
         }
 
         .active-step {
             border-color: #ff5800 !important;
             background-color: #fff0e6 !important;
-            box-shadow: 0 0 10px rgba(255, 88, 0, 0.3);
-            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 8px rgba(255, 88, 0, 0.3);
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 5px rgba(255, 88, 0, 0.2); }
-            50% { box-shadow: 0 0 15px rgba(255, 88, 0, 0.6); }
-            100% { box-shadow: 0 0 5px rgba(255, 88, 0, 0.2); }
-        }
-
-        /* --- ปุ่มเครื่องหมายถูก (ถัดไป) --- */
+        /* --- ปุ่มเครื่องหมายถูก --- */
         .next-btn {
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin-left: 8px;
-            font-size: 16px;
+            border-radius: 6px;
+            padding: 6px 10px; /* ลดขนาดปุ่ม */
+            margin-left: 5px;
+            font-size: 14px;
             cursor: pointer;
-            box-shadow: 0 4px 0 #2E7D32;
+            box-shadow: 0 3px 0 #2E7D32;
             transition: all 0.2s;
             -webkit-tap-highlight-color: transparent;
         }
 
         .next-btn:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
             box-shadow: 0 0 0 #2E7D32;
         }
 
-        /* ซ่อนสีปุ่มเครื่องหมายถูกในบรรทัดที่ไม่ได้ถูกเลือก */
         .step-row:not(.active-container) .next-btn {
             background-color: #ccc;
-            box-shadow: 0 4px 0 #aaa;
+            box-shadow: 0 3px 0 #aaa;
             opacity: 0.5;
         }
 
@@ -189,7 +182,7 @@
             color: white;
             border: none;
             padding: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 8px;
             margin-top: auto;
@@ -209,6 +202,7 @@
         <h1>🎲 CFOP Tracker</h1>
     </div>
 
+    <!-- แผงปุ่มกด 4x3 -->
     <div class="keypad">
         <button class="cube-btn btn-u" onclick="pressBtn('U')">U</button>
         <button class="cube-btn btn-u prime" onclick="pressBtn('U\'')">U'</button>
@@ -226,6 +220,7 @@
         <button class="cube-btn btn-b prime" onclick="pressBtn('B\'')">B'</button>
     </div>
 
+    <!-- แผงแสดงผล -->
     <div class="display-board">
         <div class="step-row active-container" id="row-cross" onclick="setActiveRow('cross')">
             <div class="step-label">CROSS</div>
@@ -273,11 +268,9 @@
     </div>
 
     <script>
-        // ลำดับของแต่ละบรรทัด
         const stepOrder = ['cross', 'f1', 'f2', 'f3', 'f4', 'oll', 'pll'];
         let currentActiveRow = 'cross';
 
-        // 1. ฟังก์ชันสลับบรรทัดแบบ Manual (เมื่อใช้นิ้วจิ้มเลือกบรรทัดที่ต้องการแก้ไข)
         function setActiveRow(rowId) {
             document.querySelectorAll('.step-input').forEach(input => input.classList.remove('active-step'));
             document.querySelectorAll('.step-row').forEach(row => row.classList.remove('active-container'));
@@ -289,24 +282,19 @@
             if (navigator.vibrate) navigator.vibrate(20);
         }
 
-        // 2. ฟังก์ชันกดเพื่อไปบรรทัดถัดไป (เมื่อกดเครื่องหมาย ✅)
         function goToNext(currentId, event) {
-            // ป้องกันไม่ให้การกดปุ่มไปทับซ้อนกับการกดเลือกบรรทัด (onclick ของ step-row)
             event.stopPropagation();
             if (navigator.vibrate) navigator.vibrate(20);
 
-            // หาว่าตอนนี้อยู่บรรทัดที่เท่าไหร่ แล้วเลื่อนไปยังอันถัดไป
             const currentIndex = stepOrder.indexOf(currentId);
             if (currentIndex < stepOrder.length - 1) {
                 const nextId = stepOrder[currentIndex + 1];
                 setActiveRow(nextId);
             } else {
-                // หากอยู่บรรทัดสุดท้าย (PLL) แจ้งเตือนว่าเสร็จสิ้นแล้ว
                 alert("🎉 บันทึกลำดับเสร็จสิ้นครบทุกขั้นตอน!");
             }
         }
 
-        // 3. ฟังก์ชันพิมพ์ตัวอักษร
         function pressBtn(move) {
             const displayBox = document.getElementById(currentActiveRow);
             if (navigator.vibrate) navigator.vibrate(30);
@@ -316,18 +304,16 @@
             } else {
                 displayBox.value += ' ' + move;
             }
+            // หากเกิด 10 ตัวแล้วมีการล้นจริงๆ กล่องยังคงเลื่อนขวาให้อัตโนมัติอยู่
             displayBox.scrollLeft = displayBox.scrollWidth;
         }
 
-        // 4. ฟังก์ชันเคลียร์หน้าจอ
         function clearSequence() {
             if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
 
             stepOrder.forEach(row => {
                 document.getElementById(row).value = '';
             });
-            
-            // ล้างเสร็จให้กลับไปเริ่มที่ CROSS
             setActiveRow('cross');
         }
     </script>
