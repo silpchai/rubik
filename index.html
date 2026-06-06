@@ -3,123 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ปุ่มควบคุมรูบิค (แนวนอน)</title>
+    <title>Rubik's Tracker (ทำทีละบรรทัด)</title>
     <style>
-        /* รีเซ็ตค่าเริ่มต้นและตั้งให้ไม่สามารถเลื่อนหน้าจอได้ (กันจอเด้งเวลาบนมือถือ) */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             height: 100vh;
             display: flex;
-            overflow: hidden;
-        }
-
-        /* --- แจ้งเตือนเมื่อจอเป็นแนวตั้ง --- */
-        .portrait-warning {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #333;
-            color: #fff;
-            z-index: 9999;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            overflow: hidden;
+            color: #333;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            color: white;
             text-align: center;
-            font-size: 22px;
-            padding: 20px;
-            box-sizing: border-box;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* ตรวจจับแนวตั้ง (Portrait) ให้แสดงหน้าต่างเตือน */
-        @media (orientation: portrait) {
-            .portrait-warning { display: flex; }
-            .app-container { display: none !important; }
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 1px;
         }
 
-        /* --- โครงสร้างแอป --- */
-        .app-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* ฝั่งซ้าย: ปุ่มกด */
-        .left-panel {
-            flex: 1;
-            padding: 10px;
-            border-right: 2px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background-color: #fff;
-        }
-
-        /* ฝั่งขวา: ส่วนแสดงผล (เลื่อนลงได้ถ้าจอมือถือเล็กไป) */
-        .right-panel {
-            flex: 1.2;
-            padding: 10px 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            background-color: #f9f9f9;
-        }
-
-        h3 {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #444;
-            text-align: center;
-        }
-
-        /* กลุ่มปุ่ม จัดเป็น 3x2 เพื่อประหยัดพื้นที่แนวตั้ง */
-        .button-group {
+        /* --- แผงปุ่มกด --- */
+        .keypad {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             margin-bottom: 15px;
         }
 
-        button {
-            padding: 12px 5px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            background-color: #fff;
-            border: 2px solid #ccc;
-            border-radius: 8px;
+        button.cube-btn {
+            position: relative;
+            padding: 12px 0;
+            font-size: 20px;
+            font-weight: 900;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            -webkit-tap-highlight-color: transparent; /* เอาแถบไฮไลท์เวลาจิ้มบนมือถือออก */
+            outline: none;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        button:active {
-            background-color: #d0d0d0;
-            transform: scale(0.95);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        button.cube-btn:active {
+            transform: translateY(5px);
         }
 
-        .prime-btn {
-            background-color: #f0f8ff;
-            border-color: #add8e6;
+        .btn-u { background-color: #ffffff; color: #333 !important; text-shadow: none !important; box-shadow: 0 5px 0 #cccccc; }
+        .btn-u:active { box-shadow: 0 0px 0 #cccccc; }
+        .btn-d { background-color: #ffd500; color: #333 !important; text-shadow: none !important; box-shadow: 0 5px 0 #ccaa00; }
+        .btn-d:active { box-shadow: 0 0px 0 #ccaa00; }
+        .btn-l { background-color: #ff5800; color: white; box-shadow: 0 5px 0 #cc4600; }
+        .btn-l:active { box-shadow: 0 0px 0 #cc4600; }
+        .btn-r { background-color: #b71234; color: white; box-shadow: 0 5px 0 #8c0e27; }
+        .btn-r:active { box-shadow: 0 0px 0 #8c0e27; }
+        .btn-f { background-color: #009b48; color: white; box-shadow: 0 5px 0 #007a38; }
+        .btn-f:active { box-shadow: 0 0px 0 #007a38; }
+        .btn-b { background-color: #0046ad; color: white; box-shadow: 0 5px 0 #003685; }
+        .btn-b:active { box-shadow: 0 0px 0 #003685; }
+
+        .prime {
+            background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+            background-size: 10px 10px;
         }
 
-        /* --- สไตล์ส่วนแสดงผล (ฝั่งขวา) --- */
+        /* --- แผงแสดงผล --- */
+        .display-board {
+            width: 90%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 10px 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
         .step-row {
             display: flex;
             align-items: center;
             width: 100%;
             margin-bottom: 8px;
             cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .step-row.active-container {
+            transform: scale(1.02);
         }
 
         .step-label {
-            width: 60px;
-            font-weight: bold;
-            font-size: 15px;
-            color: #444;
+            width: 55px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #555;
             text-align: right;
             padding-right: 10px;
         }
@@ -127,151 +132,202 @@
         .step-input {
             flex-grow: 1;
             padding: 8px 10px;
-            font-size: 16px;
-            font-family: monospace;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            background-color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
             pointer-events: none;
+            color: #222;
+            transition: all 0.3s;
+            width: 0; /* กันกล่องทะลุเวลาเพิ่มปุ่มใหม่ */
         }
 
         .active-step {
-            border-color: #007bff;
-            background-color: #e6f2ff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+            border-color: #ff5800 !important;
+            background-color: #fff0e6 !important;
+            box-shadow: 0 0 10px rgba(255, 88, 0, 0.3);
+            animation: pulse 1.5s infinite;
         }
 
-        .header-right {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px rgba(255, 88, 0, 0.2); }
+            50% { box-shadow: 0 0 15px rgba(255, 88, 0, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(255, 88, 0, 0.2); }
         }
 
-        .header-right h3 {
-            margin: 0;
-            font-size: 18px;
+        /* --- ปุ่มเครื่องหมายถูก (ถัดไป) --- */
+        .next-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-left: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2E7D32;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .next-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #2E7D32;
+        }
+
+        /* ซ่อนสีปุ่มเครื่องหมายถูกในบรรทัดที่ไม่ได้ถูกเลือก */
+        .step-row:not(.active-container) .next-btn {
+            background-color: #ccc;
+            box-shadow: 0 4px 0 #aaa;
+            opacity: 0.5;
         }
 
         .clear-btn {
-            background-color: #ff4d4d;
+            background-color: #333;
             color: white;
             border: none;
-            padding: 8px 15px;
-            font-size: 14px;
-            border-radius: 6px;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-top: auto;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #111;
+            transition: all 0.1s;
         }
-
         .clear-btn:active {
-            background-color: #cc0000;
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #111;
         }
     </style>
 </head>
 <body>
 
-    <div class="portrait-warning">
-        <div style="font-size: 50px; margin-bottom: 20px;">🔄</div>
-        กรุณาหมุนโทรศัพท์เป็น<br><b>"แนวนอน"</b><br>เพื่อใช้งาน
+    <div class="header">
+        <h1>🎲 CFOP Tracker</h1>
     </div>
 
-    <div class="app-container">
-        
-        <div class="left-panel">
-            <h3>ตามเข็มนาฬิกา</h3>
-            <div class="button-group">
-                <button onclick="addMove('U')">U</button>
-                <button onclick="addMove('D')">D</button>
-                <button onclick="addMove('L')">L</button>
-                <button onclick="addMove('R')">R</button>
-                <button onclick="addMove('F')">F</button>
-                <button onclick="addMove('B')">B</button>
-            </div>
+    <div class="keypad">
+        <button class="cube-btn btn-u" onclick="pressBtn('U')">U</button>
+        <button class="cube-btn btn-u prime" onclick="pressBtn('U\'')">U'</button>
+        <button class="cube-btn btn-d" onclick="pressBtn('D')">D</button>
+        <button class="cube-btn btn-d prime" onclick="pressBtn('D\'')">D'</button>
 
-            <h3>ทวนเข็มนาฬิกา</h3>
-            <div class="button-group">
-                <button class="prime-btn" onclick="addMove('U\'')">U'</button>
-                <button class="prime-btn" onclick="addMove('D\'')">D'</button>
-                <button class="prime-btn" onclick="addMove('L\'')">L'</button>
-                <button class="prime-btn" onclick="addMove('R\'')">R'</button>
-                <button class="prime-btn" onclick="addMove('F\'')">F'</button>
-                <button class="prime-btn" onclick="addMove('B\'')">B'</button>
-            </div>
+        <button class="cube-btn btn-l" onclick="pressBtn('L')">L</button>
+        <button class="cube-btn btn-l prime" onclick="pressBtn('L\'')">L'</button>
+        <button class="cube-btn btn-r" onclick="pressBtn('R')">R</button>
+        <button class="cube-btn btn-r prime" onclick="pressBtn('R\'')">R'</button>
+
+        <button class="cube-btn btn-f" onclick="pressBtn('F')">F</button>
+        <button class="cube-btn btn-f prime" onclick="pressBtn('F\'')">F'</button>
+        <button class="cube-btn btn-b" onclick="pressBtn('B')">B</button>
+        <button class="cube-btn btn-b prime" onclick="pressBtn('B\'')">B'</button>
+    </div>
+
+    <div class="display-board">
+        <div class="step-row active-container" id="row-cross" onclick="setActiveRow('cross')">
+            <div class="step-label">CROSS</div>
+            <input type="text" id="cross" class="step-input active-step" readonly>
+            <button class="next-btn" onclick="goToNext('cross', event)">✅</button>
         </div>
 
-        <div class="right-panel">
-            <div class="header-right">
-                <h3>ลำดับการหมุน</h3>
-                <button class="clear-btn" onclick="clearSequence()">ล้างข้อมูล</button>
-            </div>
-            
-            <div class="step-row" onclick="setActiveRow('cross')">
-                <div class="step-label">CROSS</div>
-                <input type="text" id="cross" class="step-input active-step" readonly>
-            </div>
-
-            <div class="step-row" onclick="setActiveRow('f1')">
-                <div class="step-label">F1</div>
-                <input type="text" id="f1" class="step-input" readonly>
-            </div>
-
-            <div class="step-row" onclick="setActiveRow('f2')">
-                <div class="step-label">F2</div>
-                <input type="text" id="f2" class="step-input" readonly>
-            </div>
-
-            <div class="step-row" onclick="setActiveRow('f3')">
-                <div class="step-label">F3</div>
-                <input type="text" id="f3" class="step-input" readonly>
-            </div>
-
-            <div class="step-row" onclick="setActiveRow('f4')">
-                <div class="step-label">F4</div>
-                <input type="text" id="f4" class="step-input" readonly>
-            </div>
-
-            <div class="step-row" onclick="setActiveRow('oll')">
-                <div class="step-label">OLL</div>
-                <input type="text" id="oll" class="step-input" readonly>
-            </div>
-
-            <div class="step-row" onclick="setActiveRow('pll')">
-                <div class="step-label">PLL</div>
-                <input type="text" id="pll" class="step-input" readonly>
-            </div>
+        <div class="step-row" id="row-f1" onclick="setActiveRow('f1')">
+            <div class="step-label">F1</div>
+            <input type="text" id="f1" class="step-input" readonly>
+            <button class="next-btn" onclick="goToNext('f1', event)">✅</button>
         </div>
 
+        <div class="step-row" id="row-f2" onclick="setActiveRow('f2')">
+            <div class="step-label">F2</div>
+            <input type="text" id="f2" class="step-input" readonly>
+            <button class="next-btn" onclick="goToNext('f2', event)">✅</button>
+        </div>
+
+        <div class="step-row" id="row-f3" onclick="setActiveRow('f3')">
+            <div class="step-label">F3</div>
+            <input type="text" id="f3" class="step-input" readonly>
+            <button class="next-btn" onclick="goToNext('f3', event)">✅</button>
+        </div>
+
+        <div class="step-row" id="row-f4" onclick="setActiveRow('f4')">
+            <div class="step-label">F4</div>
+            <input type="text" id="f4" class="step-input" readonly>
+            <button class="next-btn" onclick="goToNext('f4', event)">✅</button>
+        </div>
+
+        <div class="step-row" id="row-oll" onclick="setActiveRow('oll')">
+            <div class="step-label">OLL</div>
+            <input type="text" id="oll" class="step-input" readonly>
+            <button class="next-btn" onclick="goToNext('oll', event)">✅</button>
+        </div>
+
+        <div class="step-row" id="row-pll" onclick="setActiveRow('pll')">
+            <div class="step-label">PLL</div>
+            <input type="text" id="pll" class="step-input" readonly>
+            <button class="next-btn" onclick="goToNext('pll', event)">✅</button>
+        </div>
+
+        <button class="clear-btn" onclick="clearSequence()">🗑️ ล้างข้อมูลทั้งหมด</button>
     </div>
 
     <script>
+        // ลำดับของแต่ละบรรทัด
+        const stepOrder = ['cross', 'f1', 'f2', 'f3', 'f4', 'oll', 'pll'];
         let currentActiveRow = 'cross';
 
+        // 1. ฟังก์ชันสลับบรรทัดแบบ Manual (เมื่อใช้นิ้วจิ้มเลือกบรรทัดที่ต้องการแก้ไข)
         function setActiveRow(rowId) {
-            document.querySelectorAll('.step-input').forEach(input => {
-                input.classList.remove('active-step');
-            });
+            document.querySelectorAll('.step-input').forEach(input => input.classList.remove('active-step'));
+            document.querySelectorAll('.step-row').forEach(row => row.classList.remove('active-container'));
             
             currentActiveRow = rowId;
             document.getElementById(rowId).classList.add('active-step');
+            document.getElementById('row-' + rowId).classList.add('active-container');
+            
+            if (navigator.vibrate) navigator.vibrate(20);
         }
 
-        function addMove(move) {
+        // 2. ฟังก์ชันกดเพื่อไปบรรทัดถัดไป (เมื่อกดเครื่องหมาย ✅)
+        function goToNext(currentId, event) {
+            // ป้องกันไม่ให้การกดปุ่มไปทับซ้อนกับการกดเลือกบรรทัด (onclick ของ step-row)
+            event.stopPropagation();
+            if (navigator.vibrate) navigator.vibrate(20);
+
+            // หาว่าตอนนี้อยู่บรรทัดที่เท่าไหร่ แล้วเลื่อนไปยังอันถัดไป
+            const currentIndex = stepOrder.indexOf(currentId);
+            if (currentIndex < stepOrder.length - 1) {
+                const nextId = stepOrder[currentIndex + 1];
+                setActiveRow(nextId);
+            } else {
+                // หากอยู่บรรทัดสุดท้าย (PLL) แจ้งเตือนว่าเสร็จสิ้นแล้ว
+                alert("🎉 บันทึกลำดับเสร็จสิ้นครบทุกขั้นตอน!");
+            }
+        }
+
+        // 3. ฟังก์ชันพิมพ์ตัวอักษร
+        function pressBtn(move) {
             const displayBox = document.getElementById(currentActiveRow);
-            
+            if (navigator.vibrate) navigator.vibrate(30);
+
             if (displayBox.value === '') {
                 displayBox.value = move;
             } else {
                 displayBox.value += ' ' + move;
             }
-            
-            // ทำให้ช่องเลื่อนไปขวาสุดอัตโนมัติหากข้อความยาวเกินไป
             displayBox.scrollLeft = displayBox.scrollWidth;
         }
 
+        // 4. ฟังก์ชันเคลียร์หน้าจอ
         function clearSequence() {
-            const rows = ['cross', 'f1', 'f2', 'f3', 'f4', 'oll', 'pll'];
-            rows.forEach(row => {
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+            stepOrder.forEach(row => {
                 document.getElementById(row).value = '';
             });
+            
+            // ล้างเสร็จให้กลับไปเริ่มที่ CROSS
             setActiveRow('cross');
         }
     </script>
