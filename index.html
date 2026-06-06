@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ปุ่มควบคุมรูบิค (แนวนอน)</title>
+    <style>
+        /* รีเซ็ตค่าเริ่มต้นและตั้งให้ไม่สามารถเลื่อนหน้าจอได้ (กันจอเด้งเวลาบนมือถือ) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- แจ้งเตือนเมื่อจอเป็นแนวตั้ง --- */
+        .portrait-warning {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #333;
+            color: #fff;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 22px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* ตรวจจับแนวตั้ง (Portrait) ให้แสดงหน้าต่างเตือน */
+        @media (orientation: portrait) {
+            .portrait-warning { display: flex; }
+            .app-container { display: none !important; }
+        }
+
+        /* --- โครงสร้างแอป --- */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ฝั่งซ้าย: ปุ่มกด */
+        .left-panel {
+            flex: 1;
+            padding: 10px;
+            border-right: 2px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: #fff;
+        }
+
+        /* ฝั่งขวา: ส่วนแสดงผล (เลื่อนลงได้ถ้าจอมือถือเล็กไป) */
+        .right-panel {
+            flex: 1.2;
+            padding: 10px 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+        }
+
+        h3 {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #444;
+            text-align: center;
+        }
+
+        /* กลุ่มปุ่ม จัดเป็น 3x2 เพื่อประหยัดพื้นที่แนวตั้ง */
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 12px 5px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            -webkit-tap-highlight-color: transparent; /* เอาแถบไฮไลท์เวลาจิ้มบนมือถือออก */
+        }
+
+        button:active {
+            background-color: #d0d0d0;
+            transform: scale(0.95);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .prime-btn {
+            background-color: #f0f8ff;
+            border-color: #add8e6;
+        }
+
+        /* --- สไตล์ส่วนแสดงผล (ฝั่งขวา) --- */
+        .step-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .step-label {
+            width: 60px;
+            font-weight: bold;
+            font-size: 15px;
+            color: #444;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .step-input {
+            flex-grow: 1;
+            padding: 8px 10px;
+            font-size: 16px;
+            font-family: monospace;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            pointer-events: none;
+        }
+
+        .active-step {
+            border-color: #007bff;
+            background-color: #e6f2ff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+        }
+
+        .header-right {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .header-right h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .clear-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+
+        .clear-btn:active {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portrait-warning">
+        <div style="font-size: 50px; margin-bottom: 20px;">🔄</div>
+        กรุณาหมุนโทรศัพท์เป็น<br><b>"แนวนอน"</b><br>เพื่อใช้งาน
+    </div>
+
+    <div class="app-container">
+        
+        <div class="left-panel">
+            <h3>ตามเข็มนาฬิกา</h3>
+            <div class="button-group">
+                <button onclick="addMove('U')">U</button>
+                <button onclick="addMove('D')">D</button>
+                <button onclick="addMove('L')">L</button>
+                <button onclick="addMove('R')">R</button>
+                <button onclick="addMove('F')">F</button>
+                <button onclick="addMove('B')">B</button>
+            </div>
+
+            <h3>ทวนเข็มนาฬิกา</h3>
+            <div class="button-group">
+                <button class="prime-btn" onclick="addMove('U\'')">U'</button>
+                <button class="prime-btn" onclick="addMove('D\'')">D'</button>
+                <button class="prime-btn" onclick="addMove('L\'')">L'</button>
+                <button class="prime-btn" onclick="addMove('R\'')">R'</button>
+                <button class="prime-btn" onclick="addMove('F\'')">F'</button>
+                <button class="prime-btn" onclick="addMove('B\'')">B'</button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="header-right">
+                <h3>ลำดับการหมุน</h3>
+                <button class="clear-btn" onclick="clearSequence()">ล้างข้อมูล</button>
+            </div>
+            
+            <div class="step-row" onclick="setActiveRow('cross')">
+                <div class="step-label">CROSS</div>
+                <input type="text" id="cross" class="step-input active-step" readonly>
+            </div>
+
+            <div class="step-row" onclick="setActiveRow('f1')">
+                <div class="step-label">F1</div>
+                <input type="text" id="f1" class="step-input" readonly>
+            </div>
+
+            <div class="step-row" onclick="setActiveRow('f2')">
+                <div class="step-label">F2</div>
+                <input type="text" id="f2" class="step-input" readonly>
+            </div>
+
+            <div class="step-row" onclick="setActiveRow('f3')">
+                <div class="step-label">F3</div>
+                <input type="text" id="f3" class="step-input" readonly>
+            </div>
+
+            <div class="step-row" onclick="setActiveRow('f4')">
+                <div class="step-label">F4</div>
+                <input type="text" id="f4" class="step-input" readonly>
+            </div>
+
+            <div class="step-row" onclick="setActiveRow('oll')">
+                <div class="step-label">OLL</div>
+                <input type="text" id="oll" class="step-input" readonly>
+            </div>
+
+            <div class="step-row" onclick="setActiveRow('pll')">
+                <div class="step-label">PLL</div>
+                <input type="text" id="pll" class="step-input" readonly>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentActiveRow = 'cross';
+
+        function setActiveRow(rowId) {
+            document.querySelectorAll('.step-input').forEach(input => {
+                input.classList.remove('active-step');
+            });
+            
+            currentActiveRow = rowId;
+            document.getElementById(rowId).classList.add('active-step');
+        }
+
+        function addMove(move) {
+            const displayBox = document.getElementById(currentActiveRow);
+            
+            if (displayBox.value === '') {
+                displayBox.value = move;
+            } else {
+                displayBox.value += ' ' + move;
+            }
+            
+            // ทำให้ช่องเลื่อนไปขวาสุดอัตโนมัติหากข้อความยาวเกินไป
+            displayBox.scrollLeft = displayBox.scrollWidth;
+        }
+
+        function clearSequence() {
+            const rows = ['cross', 'f1', 'f2', 'f3', 'f4', 'oll', 'pll'];
+            rows.forEach(row => {
+                document.getElementById(row).value = '';
+            });
+            setActiveRow('cross');
+        }
+    </script>
+
+</body>
+</html>
